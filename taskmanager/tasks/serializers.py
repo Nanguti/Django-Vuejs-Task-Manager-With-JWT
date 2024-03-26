@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Task, Category
+from djoser.serializers import UserSerializer
+from django.contrib.auth import get_user_model
+from djoser.serializers import UserSerializer as DjoserUserSerializer
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email'] 
+class UserSerializer(DjoserUserSerializer):
+    class Meta(DjoserUserSerializer.Meta):
+        fields = ['id', 'username', 'email', 'is_superuser']
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

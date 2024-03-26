@@ -107,6 +107,7 @@ import { BellIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { useRouter } from "vue-router";
 
 const userData = JSON.parse(localStorage.getItem("userData"));
+
 const router = useRouter();
 
 const signOut = () => {

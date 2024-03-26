@@ -6,7 +6,7 @@
           <h2 class="text-base font-semibold leading-7 text-gray-900">
             Add Task
           </h2>
-
+          <pre>{{ userData }}</pre>
           <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div class="col-span-full">
               <label
@@ -102,12 +102,12 @@
               </div>
             </div>
 
-            <label for="dueDate">Due Date:</label>
+            <!-- <label for="dueDate">Due Date:</label>
             <datepicker
               v-model="dueDate"
               format="yyyy-MM-dd"
               :clear-button="true"
-            ></datepicker>
+            ></datepicker> -->
           </div>
         </div>
       </div>
@@ -155,8 +155,11 @@ const formData = {
   category: "",
 };
 
+console.log("check if it is super admin " + userData.isSuperUser);
+
 const newCategory = ref("");
 const categories = ref([]);
+const users = ref([]);
 
 const fetchCategories = async () => {
   try {
@@ -166,9 +169,26 @@ const fetchCategories = async () => {
     ] = `Token ${accessToken}`;
 
     const response = await axiosClient.get("/categories/");
+
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
+    return [];
+  }
+};
+
+const getUsers = async () => {
+  try {
+    const accessToken = localStorage.getItem("accessToken");
+    axiosClient.defaults.headers.common[
+      "Authorization"
+    ] = `Token ${accessToken}`;
+
+    const response = await axiosClient.get("/auth/users/");
+    console.log("users from func" + response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
     return [];
   }
 };
@@ -203,5 +223,6 @@ const cancel = () => {
 
 onMounted(async () => {
   categories.value = await fetchCategories();
+  users.value = await getUsers();
 });
 </script>

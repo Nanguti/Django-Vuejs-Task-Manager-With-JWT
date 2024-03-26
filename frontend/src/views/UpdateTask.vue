@@ -102,13 +102,6 @@
                 </select>
               </div>
             </div>
-
-            <label for="dueDate">Due Date:</label>
-            <datepicker
-              v-model="dueDate"
-              format="yyyy-MM-dd"
-              :clear-button="true"
-            ></datepicker>
           </div>
         </div>
       </div>
@@ -147,14 +140,16 @@ const router = useRouter();
 const userData = JSON.parse(localStorage.getItem("userData"));
 const isSuperUser = userData.is_superuser;
 
-const formData = {
+const taskId = router.currentRoute.value.params.taskId;
+
+const formData = ref({
   title: "",
   description: "",
   owner: userData.id,
   completed: false,
   assignee: isSuperUser ? null : userData.id,
   category: "",
-};
+});
 
 const newCategory = ref("");
 const categories = ref([]);
@@ -167,10 +162,25 @@ const fetchCategories = async () => {
     ] = `Token ${accessToken}`;
 
     const response = await axiosClient.get("/categories/");
-    return response.data;
+    categories.value = response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
-    return [];
+  }
+};
+
+const fetchTaskDetails = async () => {
+  try {
+    const accessToken = localStorage.getItem("accessToken");
+    axiosClient.defaults.headers.common[
+      "Authorization"
+    ] = `Token ${accessToken}`;
+
+    const response = await axiosClient.get(`/tasks/${taskId}`);
+    const taskData = response.data;
+    formData.value.title = taskData.title;
+    formData.value.description = taskData.description;
+  } catch (error) {
+    console.error("Error fetching task details:", error);
   }
 };
 
@@ -184,13 +194,13 @@ const updateTask = async () => {
       const response = await axiosClient.post("/categories/", {
         name: newCategory.value.trim(),
       });
-      formData.category = response.data.id;
+      formData.value.category = response.data.id;
     }
-    if (isSuperUser && formData.assignee) {
-      formData.owner = formData.assignee;
+    if (isSuperUser && formData.value.assignee) {
+      formData.value.owner = formData.value.assignee;
     }
 
-    const response = await axiosClient.put(`/tasks/${taskId}`, formData); // Replace `taskId` with the actual task ID
+    const response = await axiosClient.put(`/tasks/${taskId}/`, formData.value);
     $toast.success("Task Successfully Updated!");
     router.push("/");
   } catch (error) {
@@ -203,6 +213,7 @@ const cancel = () => {
 };
 
 onMounted(async () => {
-  categories.value = await fetchCategories();
+  await fetchCategories();
+  await fetchTaskDetails();
 });
 </script>

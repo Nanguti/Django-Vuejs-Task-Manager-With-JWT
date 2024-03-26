@@ -44,7 +44,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser'
 ]
-
+DJOSER = {
+    'SERIALIZERS': {
+        'current_user': 'tasks.serializers.UserSerializer',
+    }
+}
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
