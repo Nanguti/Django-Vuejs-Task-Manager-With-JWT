@@ -12,7 +12,11 @@
               <h1 class="text-center text-2xl font-semibold text-gray-600">
                 Login
               </h1>
+
               <hr />
+              <div v-if="errorMessage" class="text-red-500 mt-2">
+                {{ errorMessage }}
+              </div>
               <div class="flex items-center border-2 py-2 px-3 rounded-md mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -115,24 +119,19 @@
 <script setup>
 import GuestLayout from "../layouts/GuestLayout.vue";
 import axiosClient from "../axios";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
-
 const formData = {
   username: "",
   password: "",
 };
+const errorMessage = ref("");
 
 const login = async () => {
   try {
     const response = await axiosClient.post("/auth/token/login/", formData);
     if (response.status === 200 && response.data.auth_token) {
-      const accessToken = response.data.auth_token;
-      localStorage.setItem("accessToken", accessToken);
-      axiosClient.defaults.headers.common[
-        "Authorization"
-      ] = `Token ${accessToken}`;
-
       const userResponse = await axiosClient.get("/auth/users/me/");
       if (userResponse.status === 200) {
         const userData = userResponse.data;
@@ -144,7 +143,7 @@ const login = async () => {
       }
     }
   } catch (error) {
-    console.error("Login error:", error.response.data);
+    errorMessage.value = error.response.data.non_field_errors[0];
   }
 };
 </script>

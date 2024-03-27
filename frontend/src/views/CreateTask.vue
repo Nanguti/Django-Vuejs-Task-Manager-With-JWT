@@ -6,7 +6,6 @@
           <h2 class="text-base font-semibold leading-7 text-gray-900">
             Add Task
           </h2>
-          <pre>{{ userData }}</pre>
           <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div class="col-span-full">
               <label
@@ -155,21 +154,13 @@ const formData = {
   category: "",
 };
 
-console.log("check if it is super admin " + userData.isSuperUser);
-
 const newCategory = ref("");
 const categories = ref([]);
 const users = ref([]);
 
 const fetchCategories = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
-
     const response = await axiosClient.get("/categories/");
-
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -179,11 +170,6 @@ const fetchCategories = async () => {
 
 const getUsers = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
-
     const response = await axiosClient.get("/auth/users/");
     console.log("users from func" + response.data);
     return response.data;
@@ -195,10 +181,6 @@ const getUsers = async () => {
 
 const addTask = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
     if (newCategory.value.trim() !== "") {
       const response = await axiosClient.post("/categories/", {
         name: newCategory.value.trim(),
@@ -208,7 +190,6 @@ const addTask = async () => {
     if (isSuperUser && formData.assignee) {
       formData.owner = formData.assignee;
     }
-
     const response = await axiosClient.post("/tasks/", formData);
     $toast.success("Task Successfully Added!");
     router.push("/");

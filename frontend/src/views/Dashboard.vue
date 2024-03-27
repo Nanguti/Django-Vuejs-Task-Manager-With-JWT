@@ -2,7 +2,7 @@
   <AuthenticatedLayout>
     <div class="p-4">
       <div
-        class="max-w-lg mx-auto my-10 bg-white p-8 rounded-xl shadow shadow-slate-300"
+        class="max-w-[75%] mx-auto my-10 bg-white p-8 rounded-xl shadow shadow-slate-300"
       >
         <div class="flex flex-row justify-between items-center">
           <div>
@@ -34,6 +34,13 @@
 
         <div id="tasks" class="my-5">
           <div
+            v-if="tasks.length === 0"
+            class="text-center font-semibold text-gray-500"
+          >
+            You do not have tasks at the moment! Would like to create one?
+          </div>
+          <div
+            v-else
             v-for="task in tasks"
             :key="task.id"
             class="flex justify-between items-center border-b border-slate-200 py-3 px-2 border-l-4 border-l-transparent bg-gradient-to-r from-transparent to-transparent hover:from-slate-100 transition ease-linear duration-150"
@@ -118,12 +125,9 @@ import { useRouter } from "vue-router";
 const $toast = useToast();
 const router = useRouter();
 const tasks = ref([]);
-const accessToken = localStorage.getItem("accessToken");
+
 const fetchTasks = async () => {
   try {
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
     const response = await axiosClient.get("/tasks/");
     tasks.value = response.data;
   } catch (error) {
@@ -133,9 +137,6 @@ const fetchTasks = async () => {
 
 const completeTask = async (taskId) => {
   try {
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
     await axiosClient.patch(`/tasks/${taskId}/`, { completed: true });
     $toast.success("Task status updated sucessfully!");
     fetchTasks();
@@ -149,9 +150,6 @@ const deleteTask = async (taskId) => {
       "Are you sure you want to delete this task?"
     );
     if (confirmed) {
-      axiosClient.defaults.headers.common[
-        "Authorization"
-      ] = `Token ${accessToken}`;
       await axiosClient.delete(`/tasks/${taskId}`);
       $toast.success("Task Successfully deleted!");
       fetchTasks();

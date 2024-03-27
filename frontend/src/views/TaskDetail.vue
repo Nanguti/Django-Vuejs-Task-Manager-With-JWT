@@ -84,9 +84,6 @@ const route = useRoute();
 
 const fetchTaskDetail = async () => {
   try {
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
     const taskId = route.params.taskId;
     const response = await axiosClient.get(`/tasks/${taskId}/detail`);
     taskDetail.value = response.data;

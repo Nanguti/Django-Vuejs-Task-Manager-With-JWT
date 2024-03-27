@@ -14,6 +14,7 @@
                 class="block text-sm font-medium leading-6 text-gray-900"
                 >Title</label
               >
+
               <div class="mt-2">
                 <input
                   type="text"
@@ -41,11 +42,11 @@
                 >
                   <option value="" disabled selected>Select Category</option>
                   <option
-                    v-for="category in categories"
-                    :key="category.id"
-                    :value="category.id"
+                    v-for="cat in categories"
+                    :key="cat.id"
+                    :value="cat.id"
                   >
-                    {{ category.name }}
+                    {{ cat.name }}
                   </option>
                 </select>
               </div>
@@ -153,6 +154,7 @@ const formData = ref({
 
 const newCategory = ref("");
 const categories = ref([]);
+const users = ref([]);
 
 const fetchCategories = async () => {
   try {
@@ -168,6 +170,22 @@ const fetchCategories = async () => {
   }
 };
 
+const getUsers = async () => {
+  try {
+    const accessToken = localStorage.getItem("accessToken");
+    axiosClient.defaults.headers.common[
+      "Authorization"
+    ] = `Token ${accessToken}`;
+
+    const response = await axiosClient.get("/auth/users/");
+    console.log("users from func" + response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+};
+
 const fetchTaskDetails = async () => {
   try {
     const accessToken = localStorage.getItem("accessToken");
@@ -177,8 +195,11 @@ const fetchTaskDetails = async () => {
 
     const response = await axiosClient.get(`/tasks/${taskId}`);
     const taskData = response.data;
+    console.log("task data->" + taskData.category);
     formData.value.title = taskData.title;
     formData.value.description = taskData.description;
+    formData.value.category = taskData.category;
+    formData.value.assignee = taskData.owner;
   } catch (error) {
     console.error("Error fetching task details:", error);
   }
@@ -186,10 +207,6 @@ const fetchTaskDetails = async () => {
 
 const updateTask = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
     if (newCategory.value.trim() !== "") {
       const response = await axiosClient.post("/categories/", {
         name: newCategory.value.trim(),
@@ -200,7 +217,7 @@ const updateTask = async () => {
       formData.value.owner = formData.value.assignee;
     }
 
-    const response = await axiosClient.put(`/tasks/${taskId}/`, formData.value);
+    const response = await axiosClient.put(`/tasks/${taskId}/`, formData.value); // Replace `taskId` with the actual task ID
     $toast.success("Task Successfully Updated!");
     router.push("/");
   } catch (error) {
@@ -215,5 +232,6 @@ const cancel = () => {
 onMounted(async () => {
   await fetchCategories();
   await fetchTaskDetails();
+  users.value = await getUsers();
 });
 </script>

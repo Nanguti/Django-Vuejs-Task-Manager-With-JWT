@@ -13,6 +13,9 @@
                 Register
               </h1>
               <hr />
+              <div v-if="errorMessage" class="text-red-500 mt-2">
+                {{ errorMessage }}
+              </div>
               <div class="flex items-center border-2 py-2 px-3 rounded-md mb-4">
                 <input
                   class="pl-2 outline-none border-none w-full"
@@ -71,6 +74,18 @@
                 />
               </div>
               <div class="flex items-center border-2 py-2 px-3 rounded-md">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-gray-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
                 <input
                   class="pl-2 outline-none border-none w-full"
                   v-model="formData.password_confirmation"
@@ -98,11 +113,11 @@
 
             <button
               type="submit"
-              value="login"
-              id="login"
+              value="register"
+              id="register"
               class="mt-6 w-full shadow-xl bg-gradient-to-tr from-blue-600 to-red-400 hover:to-red-700 text-indigo-100 py-2 rounded-md text-lg tracking-wide transition duration-1000"
             >
-              Login
+              Register
             </button>
             <hr />
             <div class="flex justify-center items-center mt-4">
@@ -134,8 +149,12 @@
 import GuestLayout from "../layouts/GuestLayout.vue";
 import { useRouter } from "vue-router";
 import axiosClient from "../axios";
+import { ref } from "vue";
 
 const router = useRouter();
+const usernameError = ref("");
+const passwordErrors = ref([]);
+const errorMessage = ref("");
 const formData = {
   username: "",
   email: "",
@@ -150,7 +169,28 @@ const register = async () => {
       router.push("/login");
     }
   } catch (error) {
-    console.error(error.response.data);
+    if (
+      error.response.data.username &&
+      error.response.data.username.length > 0
+    ) {
+      usernameError.value = error.response.data.username[0];
+    } else {
+      usernameError.value = "";
+    }
+
+    if (
+      error.response.data.password &&
+      error.response.data.password.length > 0
+    ) {
+      passwordErrors.value = error.response.data.password;
+    } else {
+      passwordErrors.value = [];
+    }
+
+    errorMessage.value =
+      usernameError.value +
+      (usernameError.value && passwordErrors.value.length > 0 ? "<br>" : "") +
+      passwordErrors.value.join("<br>");
   }
 };
 </script>
