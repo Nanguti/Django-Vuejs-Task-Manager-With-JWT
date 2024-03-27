@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User
 
 
@@ -11,6 +12,12 @@ class Task(models.Model):
     completed = models.BooleanField(default=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='tasks', blank=True, null=True)
+    due_date= models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('-created_at',)
 
 class TaskUserAssignment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

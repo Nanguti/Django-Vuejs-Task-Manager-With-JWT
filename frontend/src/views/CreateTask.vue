@@ -80,6 +80,28 @@
                 Write a few sentences about task.
               </p>
             </div>
+
+            <div
+              p-2
+              block
+              w-full
+              rounded-md
+              border-0
+              py-1.5
+              text-gray-900
+              shadow-sm
+              ring-1
+              ring-inset
+              ring-gray-300
+              placeholder:text-gray-400
+              focus:ring-2
+              focus:ring-inset
+              focus:ring-indigo-600
+              sm:text-sm
+              sm:leading-6
+            >
+              <Datepicker v-model="date" />
+            </div>
             <!-- Dropdown for selecting user to assign task -->
             <div v-if="isSuperUser" class="col-span-full">
               <label
@@ -139,8 +161,10 @@ import { useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
-const $toast = useToast();
+import Datepicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
+const $toast = useToast();
 const router = useRouter();
 const userData = JSON.parse(localStorage.getItem("userData"));
 const isSuperUser = userData.is_superuser;
@@ -152,8 +176,10 @@ const formData = {
   completed: false,
   assignee: isSuperUser ? null : userData.id,
   category: "",
+  due_date: "",
 };
 
+const date = ref();
 const newCategory = ref("");
 const categories = ref([]);
 const users = ref([]);
@@ -171,7 +197,6 @@ const fetchCategories = async () => {
 const getUsers = async () => {
   try {
     const response = await axiosClient.get("/auth/users/");
-    console.log("users from func" + response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -190,6 +215,8 @@ const addTask = async () => {
     if (isSuperUser && formData.assignee) {
       formData.owner = formData.assignee;
     }
+    formData.due_date = date.value;
+    console.log("log due date from here -> " + formData.due_date);
     const response = await axiosClient.post("/tasks/", formData);
     $toast.success("Task Successfully Added!");
     router.push("/");

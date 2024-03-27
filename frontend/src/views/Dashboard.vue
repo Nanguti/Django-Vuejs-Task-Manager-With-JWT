@@ -2,7 +2,7 @@
   <AuthenticatedLayout>
     <div class="p-4">
       <div
-        class="max-w-[75%] mx-auto my-10 bg-white p-8 rounded-xl shadow shadow-slate-300"
+        class="max-w-[90%] mx-auto my-10 bg-white p-8 rounded-xl shadow shadow-slate-300"
       >
         <div class="flex flex-row justify-between items-center">
           <div>
@@ -39,72 +39,111 @@
           >
             You do not have tasks at the moment! Would like to create one?
           </div>
-          <div
-            v-else
-            v-for="task in tasks"
-            :key="task.id"
-            class="flex justify-between items-center border-b border-slate-200 py-3 px-2 border-l-4 border-l-transparent bg-gradient-to-r from-transparent to-transparent hover:from-slate-100 transition ease-linear duration-150"
-          >
-            <div class="inline-flex items-center space-x-2">
-              <div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6 text-slate-500"
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th
+                  class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
-              </div>
-              <div :class="{ 'line-through': task.completed }">
-                {{ task.title }}
-              </div>
-            </div>
-            <div class="flex items-center">
-              <EyeIcon
-                @click="handleTaskDetail(task.id)"
-                class="h-8 w-8 mx-2 text-gray-500 hover:cursor-pointer"
-                aria-hidden="true"
-              />
+                  Task Title
+                </th>
+                <th
+                  class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Assignee
+                </th>
+                <th
+                  class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Due Date
+                </th>
+                <th class="px-6 py-3 bg-gray-50">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="task in tasks" :key="task.id" class="bg-white">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-6 w-6">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6 text-slate-500"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M4.5 12.75l6 6 9-13.5"
+                        />
+                      </svg>
+                    </div>
+                    <div class="ml-4">
+                      <div :class="{ 'line-through': task.completed }">
+                        {{ task.title }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ task.owner_name }}</div>
+                </td>
 
-              <PencilIcon
-                @click="handleUpdateTask(task.id)"
-                class="h-5 w-5 mx-3 text-gray-500 hover:cursor-pointer"
-                aria-hidden="true"
-              />
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div
+                    :class="{
+                      'text-green-600': task.completed,
+                      'text-red-600':
+                        !task.completed && isPastDue(task.due_date),
+                    }"
+                    class="text-sm"
+                  >
+                    {{ formattedDueDate(task.due_date) }}
+                  </div>
+                </td>
 
-              <input
-                type="checkbox"
-                class="peer sr-only opacity-0"
-                :id="'toggle-' + task.id"
-                @change="handleCompleteTask(task.id)"
-                :checked="task.completed"
-              />
-              <label
-                :for="'toggle-' + task.id"
-                :class="{
-                  'bg-green-500': task.completed,
-                  'bg-gray-400': !task.completed,
-                  'mr-1': task.completed,
-                }"
-                class="relative flex h-6 w-11 cursor-pointer items-center rounded-full px-0.5 outline-gray-400 transition-colors before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow before:transition-transform before:duration-300 peer-focus-visible:outline peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gray-400 peer-checked:peer-focus-visible:outline-green-500"
-              >
-                <span class="sr-only">Enable</span>
-              </label>
-              <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                >
+                  <div class="flex items-center">
+                    <input
+                      type="checkbox"
+                      class="ml-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      :id="'toggle-' + task.id"
+                      @change="handleCompleteTask(task.id)"
+                      :checked="task.completed"
+                    />
+                    <label :for="'toggle-' + task.id" class="ml-1 text-gray-700"
+                      >Complete</label
+                    >
+                    <EyeIcon
+                      @click="handleTaskDetail(task.id)"
+                      class="w-5 h-5 text-indigo-700 hover:text-indigo-700 hover:cursor-pointer mx-2"
+                    >
+                      View
+                    </EyeIcon>
+                    <PencilIcon
+                      @click="handleUpdateTask(task.id)"
+                      class="h-5 w-5 text-gray-500 hover:cursor-pointer mr-2"
+                    >
+                      Edit
+                    </PencilIcon>
 
-              <TrashIcon
-                class="w-4 h-4 text-slate-500 hover:text-slate-700 hover:cursor-pointer"
-                @click="handleDeleteTask(task.id)"
-              />
-            </div>
-          </div>
+                    <div v-if="user.is_superuser" class="ml-2">
+                      <TrashIcon
+                        @click="handleDeleteTask(task.id)"
+                        class="w-4 h-4 text-red-700 hover:text-slate-700 hover:cursor-pointer"
+                      >
+                        Delete
+                      </TrashIcon>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <Pagination
           :totalCount="totalCount"
@@ -141,6 +180,8 @@ const {
   resultsPerPage,
 } = useTask();
 
+const user = JSON.parse(localStorage.getItem("userData"));
+
 const handleCompleteTask = (taskId) => {
   completeTask(taskId);
 };
@@ -156,6 +197,14 @@ const handleTaskDetail = (taskId) => {
 const handleUpdateTask = (taskId) => {
   goToUpdatePage(taskId);
 };
-
+const formattedDueDate = (dueDate) => {
+  const date = new Date(dueDate);
+  return date.toLocaleString();
+};
+const isPastDue = (dueDate) => {
+  const today = new Date();
+  const due = new Date(dueDate);
+  return due < today;
+};
 onMounted(fetchTasks);
 </script>
