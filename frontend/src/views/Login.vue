@@ -132,6 +132,7 @@ const login = async () => {
   try {
     const response = await axiosClient.post("/auth/token/login/", formData);
     if (response.status === 200 && response.data.auth_token) {
+      localStorage.setItem("accessToken", response.data.auth_token);
       const userResponse = await axiosClient.get("/auth/users/me/");
       if (userResponse.status === 200) {
         const userData = userResponse.data;
