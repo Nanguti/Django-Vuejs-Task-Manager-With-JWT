@@ -68,13 +68,13 @@
             </div>
             <div class="flex items-center">
               <EyeIcon
-                @click="goToTaskDetail(task.id)"
+                @click="handleTaskDetail(task.id)"
                 class="h-8 w-8 mx-2 text-gray-500 hover:cursor-pointer"
                 aria-hidden="true"
               />
 
               <PencilIcon
-                @click="goToUpdatePage(task.id)"
+                @click="handleUpdateTask(task.id)"
                 class="h-5 w-5 mx-3 text-gray-500 hover:cursor-pointer"
                 aria-hidden="true"
               />
@@ -83,7 +83,7 @@
                 type="checkbox"
                 class="peer sr-only opacity-0"
                 :id="'toggle-' + task.id"
-                @change="completeTask(task.id)"
+                @change="handleCompleteTask(task.id)"
                 :checked="task.completed"
               />
               <label
@@ -101,11 +101,17 @@
 
               <TrashIcon
                 class="w-4 h-4 text-slate-500 hover:text-slate-700 hover:cursor-pointer"
-                @click="deleteTask(task.id)"
+                @click="handleDeleteTask(task.id)"
               />
             </div>
           </div>
         </div>
+        <!-- <Pagination
+          :totalCount="totalCount"
+          :currentPage="currentPage"
+          :totalPages="totalPages"
+          @goToPage="getPosts"
+        /> -->
         <!-- <p class="text-xs text-slate-500 text-center">
           Last updated 
         </p> -->
@@ -115,56 +121,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import useTask from "../composables/useTask";
+import { onMounted } from "vue";
 import AuthenticatedLayout from "../layouts/AuthenticatedLayout.vue";
-import axiosClient from "../axios";
 import { TrashIcon, EyeIcon, PencilIcon } from "@heroicons/vue/24/outline";
-import { useToast } from "vue-toast-notification";
-import "vue-toast-notification/dist/theme-sugar.css";
-import { useRouter } from "vue-router";
-const $toast = useToast();
-const router = useRouter();
-const tasks = ref([]);
+const {
+  tasks,
+  fetchTasks,
+  completeTask,
+  deleteTask,
+  goToTaskDetail,
+  goToUpdatePage,
+} = useTask();
 
-const fetchTasks = async () => {
-  try {
-    const response = await axiosClient.get("/tasks/");
-    tasks.value = response.data;
-  } catch (error) {
-    console.error("Error fetching tasks:", error);
-  }
+const handleCompleteTask = (taskId) => {
+  completeTask(taskId);
 };
 
-const completeTask = async (taskId) => {
-  try {
-    await axiosClient.patch(`/tasks/${taskId}/`, { completed: true });
-    $toast.success("Task status updated sucessfully!");
-    fetchTasks();
-  } catch (error) {
-    console.error("Error completing task:", error);
-  }
-};
-const deleteTask = async (taskId) => {
-  try {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this task?"
-    );
-    if (confirmed) {
-      await axiosClient.delete(`/tasks/${taskId}`);
-      $toast.success("Task Successfully deleted!");
-      fetchTasks();
-    }
-  } catch (error) {
-    console.error("Error deleting task:", error);
-    $toast.error("Error deleting task");
-  }
+const handleDeleteTask = (taskId) => {
+  deleteTask(taskId);
 };
 
-const goToTaskDetail = (taskId) => {
-  router.push({ name: "task-detail", params: { taskId } });
+const handleTaskDetail = (taskId) => {
+  goToTaskDetail(taskId);
 };
-const goToUpdatePage = (taskId) => {
-  router.push(`/update-task/${taskId}`);
+
+const handleUpdateTask = (taskId) => {
+  goToUpdatePage(taskId);
 };
+
 onMounted(fetchTasks);
 </script>

@@ -1,24 +1,30 @@
 # views.py
 from rest_framework import generics
 from django.contrib.auth.models import User
-from .models import Task, Category
+from .models import Task, Category, TaskUserAssignment
 from .serializers import TaskSerializer, CategorySerializer
 from .permissions import IsOwnerOrAdmin, IsSuperUserOrAssignedUser
 
+
+from django.shortcuts import get_object_or_404
 
 class TaskListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
 
     def get_queryset(self):
-        # Regular users can only see tasks assigned to them
         if self.request.user.is_superuser:
             return Task.objects.all()
         else:
             return Task.objects.filter(owner=self.request.user)
 
     def perform_create(self, serializer):
-        # Assign task owner as the current user
-        serializer.save(owner=self.request.user)
+        instance = serializer.save(owner=self.request.user)
+        
+        assignee_id = self.request.data.get('assignee')
+        if assignee_id:
+            assignee = get_object_or_404(User, pk=assignee_id)
+            TaskUserAssignment.objects.create(user=assignee, task=instance)
+
 
 class TaskDetailAPIView(generics.RetrieveAPIView):
     queryset = Task.objects.all()

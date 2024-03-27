@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Task, Category
-from djoser.serializers import UserSerializer
-from django.contrib.auth import get_user_model
 from djoser.serializers import UserSerializer as DjoserUserSerializer
 
 class UserSerializer(DjoserUserSerializer):
