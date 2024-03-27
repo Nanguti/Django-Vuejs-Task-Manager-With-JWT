@@ -106,12 +106,12 @@
             </div>
           </div>
         </div>
-        <!-- <Pagination
+        <Pagination
           :totalCount="totalCount"
           :currentPage="currentPage"
           :totalPages="totalPages"
-          @goToPage="getPosts"
-        /> -->
+          @goToPage="fetchTasks"
+        />
         <!-- <p class="text-xs text-slate-500 text-center">
           Last updated 
         </p> -->
@@ -124,7 +124,9 @@
 import useTask from "../composables/useTask";
 import { onMounted } from "vue";
 import AuthenticatedLayout from "../layouts/AuthenticatedLayout.vue";
+import Pagination from "../components/Pagination.vue";
 import { TrashIcon, EyeIcon, PencilIcon } from "@heroicons/vue/24/outline";
+
 const {
   tasks,
   fetchTasks,
@@ -132,6 +134,9 @@ const {
   deleteTask,
   goToTaskDetail,
   goToUpdatePage,
+  totalCount,
+  currentPage,
+  totalPages,
 } = useTask();
 
 const handleCompleteTask = (taskId) => {
