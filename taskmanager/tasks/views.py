@@ -9,7 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 
 
 class LatestTaskPagination(PageNumberPagination):
-    page_size = 3
+    page_size = 10
 
 class TaskListCreateAPIView(generics.ListCreateAPIView):
     paginator = LatestTaskPagination()

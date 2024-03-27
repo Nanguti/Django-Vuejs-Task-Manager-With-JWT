@@ -110,6 +110,7 @@
           :totalCount="totalCount"
           :currentPage="currentPage"
           :totalPages="totalPages"
+          :resultsPerPage="resultsPerPage"
           @goToPage="fetchTasks"
         />
         <!-- <p class="text-xs text-slate-500 text-center">
@@ -137,6 +138,7 @@ const {
   totalCount,
   currentPage,
   totalPages,
+  resultsPerPage,
 } = useTask();
 
 const handleCompleteTask = (taskId) => {

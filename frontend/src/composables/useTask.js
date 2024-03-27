@@ -7,16 +7,17 @@ export default function useTask() {
   const tasks = ref([]);
   const router = useRouter();
   const $toast = useToast();
-  const taskCount = ref(0);
+  const resultsPerPage = ref(0);
   const totalCount = ref(0);
   const currentPage = ref(1);
   const totalPages = ref(0);
-  const pageSize = 3;
+  const pageSize = 10;
 
   const fetchTasks = async (pageNumber = 1) => {
     try {
       const response = await axiosClient.get(`/tasks/?page=${pageNumber}`);
       tasks.value = response.data.results;
+      resultsPerPage.value = response.data.results.length;
       totalCount.value = response.data.count;
       currentPage.value = pageNumber;
       totalPages.value = Math.ceil(response.data.count / pageSize);
@@ -65,6 +66,7 @@ export default function useTask() {
     totalCount,
     currentPage,
     totalPages,
+    resultsPerPage,
     completeTask,
     deleteTask,
     goToTaskDetail,
