@@ -8,6 +8,8 @@ import UpdateTask from "../views/tasks/UpdateTask.vue";
 import Users from "../views/users/Users.vue";
 import Categories from "../views/categories/Categories.vue";
 import CreateCategory from "../views/categories/CreateCategory.vue";
+import UpdateCategory from "../views/categories/UpdateCategory.vue";
+
 const routes = [
   {
     meta: {
@@ -46,6 +48,16 @@ const routes = [
     path: "/create-category",
     name: "create-category",
     component: CreateCategory,
+  },
+
+  {
+    meta: {
+      title: "Update Category",
+      requiresAuth: true,
+    },
+    path: "/update-category/:categoryId/",
+    name: "update-category",
+    component: UpdateCategory,
   },
 
   {

@@ -1,106 +1,29 @@
 <template>
   <AuthenticatedLayout>
-    <form @submit.prevent="updateTask">
+    <form @submit.prevent="updateCategory">
       <div class="p-8 space-y-12 max-w-[50%] mx-auto">
         <div class="border-b border-gray-900/10 pb-12">
           <h2 class="text-base font-semibold leading-7 text-gray-900">
-            Update Task
+            Update Category
           </h2>
 
           <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div class="col-span-full">
               <label
-                for="title"
+                for="name"
                 class="block text-sm font-medium leading-6 text-gray-900"
-                >Title</label
+                >Name</label
               >
 
               <div class="mt-2">
                 <input
                   type="text"
-                  name="title"
-                  id="title"
-                  v-model="formData.title"
-                  autocomplete="title"
+                  name="name"
+                  id="name"
+                  v-model="formData.name"
+                  autocomplete="name"
                   class="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
-              </div>
-            </div>
-
-            <div class="col-span-full">
-              <label
-                for="category"
-                class="block text-sm font-medium leading-6 text-gray-900"
-                >Category</label
-              >
-              <div class="mt-2">
-                <select
-                  id="category"
-                  name="category"
-                  v-model="formData.category"
-                  class="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                >
-                  <option value="" disabled selected>Select Category</option>
-                  <option
-                    v-for="cat in categories"
-                    :key="cat.id"
-                    :value="cat.id"
-                  >
-                    {{ cat.name }}
-                  </option>
-                </select>
-              </div>
-              <p class="mt-1 text-xs text-gray-600">Or</p>
-              <div class="mt-2">
-                <input
-                  type="text"
-                  name="newCategory"
-                  id="newCategory"
-                  v-model="newCategory"
-                  placeholder="New Category"
-                  class="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div class="col-span-full">
-              <label
-                for="about"
-                class="block text-sm font-medium leading-6 text-gray-900"
-                >Description</label
-              >
-              <div class="mt-2">
-                <textarea
-                  id="about"
-                  name="about"
-                  v-model="formData.description"
-                  rows="3"
-                  class="p-2 block w-full rounded-md py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                ></textarea>
-              </div>
-              <p class="mt-3 text-sm leading-6 text-gray-600">
-                Write a few sentences about task.
-              </p>
-            </div>
-
-            <!-- Dropdown for selecting user to assign task -->
-            <div v-if="isSuperUser" class="col-span-full">
-              <label
-                for="assignee"
-                class="block text-sm font-medium leading-6 text-gray-900"
-                >Assign To</label
-              >
-              <div class="mt-2">
-                <select
-                  id="assignee"
-                  name="assignee"
-                  v-model="formData.assignee"
-                  class="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                >
-                  <option v-for="user in users" :key="user.id" :value="user.id">
-                    {{ user.username }}
-                  </option>
-                </select>
               </div>
             </div>
           </div>
@@ -138,88 +61,26 @@ import "vue-toast-notification/dist/theme-sugar.css";
 const $toast = useToast();
 
 const router = useRouter();
-const userData = JSON.parse(localStorage.getItem("userData"));
-const isSuperUser = userData.is_superuser;
-
-const taskId = router.currentRoute.value.params.taskId;
-
+const categoryId = router.currentRoute.value.params.categoryId;
 const formData = ref({
-  title: "",
-  description: "",
-  owner: userData.id,
-  completed: false,
-  assignee: isSuperUser ? null : userData.id,
-  category: "",
+  name: "",
 });
 
-const newCategory = ref("");
-const categories = ref([]);
-const users = ref([]);
-
-const fetchCategories = async () => {
+const fetchCategoryDetails = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
-
-    const response = await axiosClient.get("/categories/");
-    categories.value = response.data;
+    const response = await axiosClient.get(`/categories/${categoryId}`);
+    const categoryData = response.data;
+    formData.value.name = categoryData.name;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching category details:", error);
   }
 };
 
-const getUsers = async () => {
+const updateCategory = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
-
-    const response = await axiosClient.get("/auth/users/");
-    console.log("users from func" + response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return [];
-  }
-};
-
-const fetchTaskDetails = async () => {
-  try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
-
-    const response = await axiosClient.get(`/tasks/${taskId}`);
-    const taskData = response.data;
-    console.log("task data->" + taskData.category);
-    formData.value.title = taskData.title;
-    formData.value.description = taskData.description;
-    formData.value.category = taskData.category;
-    formData.value.assignee = taskData.owner;
-  } catch (error) {
-    console.error("Error fetching task details:", error);
-  }
-};
-
-const updateTask = async () => {
-  try {
-    if (newCategory.value.trim() !== "") {
-      const response = await axiosClient.post("/categories/", {
-        name: newCategory.value.trim(),
-      });
-      formData.value.category = response.data.id;
-    }
-    if (isSuperUser && formData.value.assignee) {
-      formData.value.owner = formData.value.assignee;
-    }
-
-    const response = await axiosClient.put(`/tasks/${taskId}/`, formData.value); // Replace `taskId` with the actual task ID
-    $toast.success("Task Successfully Updated!");
-    router.push("/");
+    await axiosClient.put(`/categories/${categoryId}/`, formData.value);
+    $toast.success("Category Successfully Updated!");
+    router.push("/categories/");
   } catch (error) {
     console.error("Error updating task:", error);
   }
@@ -230,8 +91,6 @@ const cancel = () => {
 };
 
 onMounted(async () => {
-  await fetchCategories();
-  await fetchTaskDetails();
-  users.value = await getUsers();
+  await fetchCategoryDetails();
 });
 </script>

@@ -158,13 +158,8 @@ const users = ref([]);
 
 const fetchCategories = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
-
     const response = await axiosClient.get("/categories/");
-    categories.value = response.data;
+    categories.value = response.data.results;
   } catch (error) {
     console.error("Error fetching categories:", error);
   }
@@ -172,13 +167,7 @@ const fetchCategories = async () => {
 
 const getUsers = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
-
     const response = await axiosClient.get("/auth/users/");
-    console.log("users from func" + response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -188,14 +177,8 @@ const getUsers = async () => {
 
 const fetchTaskDetails = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    axiosClient.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${accessToken}`;
-
     const response = await axiosClient.get(`/tasks/${taskId}`);
     const taskData = response.data;
-    console.log("task data->" + taskData.category);
     formData.value.title = taskData.title;
     formData.value.description = taskData.description;
     formData.value.category = taskData.category;
@@ -217,7 +200,7 @@ const updateTask = async () => {
       formData.value.owner = formData.value.assignee;
     }
 
-    const response = await axiosClient.put(`/tasks/${taskId}/`, formData.value); // Replace `taskId` with the actual task ID
+    const response = await axiosClient.put(`/tasks/${taskId}/`, formData.value);
     $toast.success("Task Successfully Updated!");
     router.push("/");
   } catch (error) {

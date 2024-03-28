@@ -50,7 +50,7 @@ export default function useTask() {
   };
 
   const goToUpdatePage = (categoryId) => {
-    router.push(`/update-task/${categoryId}`);
+    router.push(`/update-category/${categoryId}/`);
   };
 
   return {
@@ -62,7 +62,6 @@ export default function useTask() {
     totalPages,
     resultsPerPage,
     deleteCategory,
-    categoryDetail,
     goToUpdatePage,
   };
 }
