@@ -11,22 +11,11 @@
           <div class="inline-flex space-x-2 items-center">
             <router-link
               to="/create-task"
-              class="p-2 border border-slate-200 rounded-md inline-flex space-x-1 items-center text-indigo-200 hover:text-white bg-indigo-600 hover:bg-indigo-500"
+              class="p-2 border border-slate-200 rounded-md inline-flex space-x-1 items-center text-white hover:text-white bg-indigo-600 hover:bg-indigo-500"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-4 h-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              <PlusCircleIcon
+                class="w-4 h-4 text-white hover:text-slate-700 hover:cursor-pointer"
+              />
               <span class="text-sm font-medium hidden md:block">Add Task</span>
             </router-link>
           </div>
@@ -165,7 +154,12 @@ import useTask from "../composables/useTask";
 import { onMounted } from "vue";
 import AuthenticatedLayout from "../layouts/AuthenticatedLayout.vue";
 import Pagination from "../components/Pagination.vue";
-import { TrashIcon, EyeIcon, PencilIcon } from "@heroicons/vue/24/outline";
+import {
+  TrashIcon,
+  EyeIcon,
+  PencilIcon,
+  PlusCircleIcon,
+} from "@heroicons/vue/24/outline";
 
 const {
   tasks,

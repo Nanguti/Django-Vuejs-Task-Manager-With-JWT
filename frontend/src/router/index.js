@@ -2,9 +2,12 @@ import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/Dashboard.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
-import CreateTask from "../views/CreateTask.vue";
-import TaskDetail from "../views/TaskDetail.vue";
-import UpdateTask from "../views/UpdateTask.vue";
+import CreateTask from "../views/tasks/CreateTask.vue";
+import TaskDetail from "../views/tasks/TaskDetail.vue";
+import UpdateTask from "../views/tasks/UpdateTask.vue";
+import Users from "../views/users/Users.vue";
+import Categories from "../views/categories/Categories.vue";
+import CreateCategory from "../views/categories/CreateCategory.vue";
 const routes = [
   {
     meta: {
@@ -15,6 +18,36 @@ const routes = [
     name: "dashboard",
     component: Dashboard,
   },
+  {
+    meta: {
+      title: "Users List",
+      requiresAuth: true,
+    },
+    path: "/users/",
+    name: "users",
+    component: Users,
+  },
+
+  {
+    meta: {
+      title: "Categories List",
+      requiresAuth: true,
+    },
+    path: "/categories/",
+    name: "categories",
+    component: Categories,
+  },
+
+  {
+    meta: {
+      title: "Create Category",
+      requiresAuth: true,
+    },
+    path: "/create-category",
+    name: "create-category",
+    component: CreateCategory,
+  },
+
   {
     meta: {
       title: "Create Task",

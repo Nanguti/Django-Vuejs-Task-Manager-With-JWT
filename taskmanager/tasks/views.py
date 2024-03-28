@@ -1,18 +1,19 @@
-# views.py
 from rest_framework import generics
 from django.contrib.auth.models import User
 from .models import Task, Category, TaskUserAssignment
 from .serializers import TaskSerializer, CategorySerializer
-from .permissions import IsOwnerOrAdmin, IsSuperUserOrAssignedUser
+from .permissions import IsSuperUserOrAssignedUser
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
+from djoser.views import UserViewSet as DjoserUserViewSet
+from rest_framework.response import Response
 
 
-class LatestTaskPagination(PageNumberPagination):
+class LatestPagination(PageNumberPagination):
     page_size = 10
 
 class TaskListCreateAPIView(generics.ListCreateAPIView):
-    paginator = LatestTaskPagination()
+    paginator = LatestPagination()
     serializer_class = TaskSerializer
 
     def get_queryset(self):
@@ -41,5 +42,25 @@ class TaskRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CategoryListCreateAPIView(generics.ListCreateAPIView):
+    paginator = LatestPagination()
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+class CustomUserViewSet(DjoserUserViewSet):
+    pagination_class = LatestPagination
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+class CategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsSuperUserOrAssignedUser]

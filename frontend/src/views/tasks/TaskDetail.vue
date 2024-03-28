@@ -73,8 +73,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import AuthenticatedLayout from "../layouts/AuthenticatedLayout.vue";
-import axiosClient from "../axios";
+import AuthenticatedLayout from "../../layouts/AuthenticatedLayout.vue";
+import axiosClient from "../../axios";
 import { PencilIcon } from "@heroicons/vue/24/outline";
 import { useRouter } from "vue-router";
 const router = useRouter();
