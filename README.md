@@ -82,6 +82,7 @@ Task Manager is a web application for managing tasks and categories. It provides
   - Vue Router (for routing)
   - Vuex (for state management)
   - Axios (for API requests)
+  - Tailwind CSS (for styling)
 
 ## Contributing
 
