@@ -87,7 +87,6 @@ const fetchTaskDetail = async () => {
     const taskId = route.params.taskId;
     const response = await axiosClient.get(`/tasks/${taskId}/detail`);
     taskDetail.value = response.data;
-    console.log(response.data);
   } catch (error) {
     console.error("Error fetching task detail:", error);
   }
