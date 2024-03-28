@@ -6,5 +6,4 @@ urlpatterns = [
     path('api/v1/', include('tasks.urls')),
     path('api/v1/auth/', include('djoser.urls')),
     path('api/v1/auth/', include('djoser.urls.authtoken')),
-
 ]

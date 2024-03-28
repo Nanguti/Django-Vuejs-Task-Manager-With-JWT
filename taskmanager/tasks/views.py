@@ -1,7 +1,7 @@
 from rest_framework import generics
 from django.contrib.auth.models import User
 from .models import Task, Category, TaskUserAssignment
-from .serializers import TaskSerializer, CategorySerializer
+from .serializers import TaskSerializer, CategorySerializer, UserSerializer
 from .permissions import IsSuperUserOrAssignedUser
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
@@ -16,6 +16,7 @@ class LatestPagination(PageNumberPagination):
 
 class CustomUserViewSet(DjoserUserViewSet):
     pagination_class = LatestPagination
+    serializer_class = UserSerializer
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -51,7 +52,7 @@ class CustomUserViewSet(DjoserUserViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
+    
 class TaskListCreateAPIView(generics.ListCreateAPIView):
     paginator = LatestPagination()
     serializer_class = TaskSerializer
@@ -85,22 +86,6 @@ class CategoryListCreateAPIView(generics.ListCreateAPIView):
     paginator = LatestPagination()
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-class CustomUserViewSet(DjoserUserViewSet):
-    pagination_class = LatestPagination
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-
 
 class CategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
