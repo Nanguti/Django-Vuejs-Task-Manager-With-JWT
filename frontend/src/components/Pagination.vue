@@ -102,8 +102,6 @@ const props = defineProps({
   },
 });
 
-console.log("log current page here+" + props.resultsPerPage);
-
 const emit = defineEmits(["goToPage"]);
 const goToPage = (pageNumber) => {
   if (pageNumber > 0 && pageNumber <= props.totalPages) {

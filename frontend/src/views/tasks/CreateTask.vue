@@ -209,7 +209,6 @@ const addTask = async () => {
       formData.owner = formData.assignee;
     }
     formData.due_date = date.value;
-    console.log("log due date from here -> " + formData.due_date);
     const response = await axiosClient.post("/tasks/", formData);
     $toast.success("Task Successfully Added!");
     router.push("/");
